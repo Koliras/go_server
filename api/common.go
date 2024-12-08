@@ -4,7 +4,5 @@ type User struct {
 	Id       int    `json:"id"`
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
+	Password Pass   `json:"password"`
 }
-
-var Users []User

@@ -10,10 +10,13 @@ import (
 )
 
 func main() {
-	s := &http.Server{
-		Addr: ":8080",
+	db, err := sql.Open("sqlite3", "./app.db")
+	if err != nil {
+		log.Fatal(err)
 	}
-	http.HandleFunc("GET /", api.Healthcheck)
-	http.HandleFunc("POST /auth/register", api.Register)
+	s := &http.Server{
+		Addr:    ":8080",
+		Handler: api.Routes(db),
+	}
 	log.Fatal(s.ListenAndServe())
 }

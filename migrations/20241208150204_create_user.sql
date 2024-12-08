@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS "users" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nickname VARCHAR(20) NOT NULL,
     email VARCHAR(255) NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS "user" (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS "user";
+DROP TABLE IF EXISTS "users";
 -- +goose StatementEnd

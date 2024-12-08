@@ -55,7 +55,7 @@ type registerBody struct {
 	Email    string `json:"email"`
 }
 
-func Register(w http.ResponseWriter, r *http.Request) {
+func (app App) Register(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.Write([]byte("Error when reading the body of the request"))
@@ -77,18 +77,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Nickname and email are required"))
 	}
 
-	lastId := 1
-	if len(Users) != 0 {
-		lastId = int(Users[len(Users)-1].Id) + 1
-	}
-	newUser := User{lastId, data.Nickname, data.Email, string(data.Password)}
-	Users = append(Users, newUser)
-	stringUser, err := json.Marshal(newUser)
+	err = app.DB.CreateUser(data.Nickname, data.Email, string(data.Password))
 	if err != nil {
-		w.Write([]byte("Error when encoding json"))
+		http.Error(w, err.Error(), 500)
 		return
 	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(stringUser)
+	w.Write([]byte("Created user"))
 }
