@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"net/http"
+
+	"github.com/Koliras/go_server/api"
+)
 
 func main() {
-	fmt.Println("Hello world")
+	s := &http.Server{
+		Addr: ":8080",
+	}
+	http.HandleFunc("GET /", api.Healthcheck)
+	log.Fatal(s.ListenAndServe())
 }
