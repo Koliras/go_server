@@ -75,6 +75,7 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 	}
 	if data.Nickname == "" || data.Email == "" {
 		w.Write([]byte("Nickname and email are required"))
+		return
 	}
 
 	err = app.DB.CreateUser(data.Nickname, data.Email, string(data.Password))
