@@ -85,3 +85,18 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write([]byte("Created user"))
 }
+
+func (app App) GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := app.DB.AllUsers()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+
+	strUsers, err := json.Marshal(users)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	w.Write(strUsers)
+}
