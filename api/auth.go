@@ -7,7 +7,7 @@ import (
 	"unicode"
 )
 
-func IsValid(p *string) (bool, string) {
+func IsValidPassword(p *string) (bool, string) {
 	if len(*p) < 8 {
 		return false, "Password is too short"
 	}
@@ -66,7 +66,7 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	valid, message := IsValid(&data.Password)
+	valid, message := IsValidPassword(&data.Password)
 	if !valid {
 		w.Write([]byte(message))
 		return
@@ -76,7 +76,13 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.DB.CreateUser(data.Nickname, data.Email, string(data.Password))
+	hashedPassword, err := hashPassword(&data.Password)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	err = app.DB.CreateUser(data.Nickname, data.Email, hashedPassword)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -98,3 +104,4 @@ func (app App) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(strUsers)
 }
+
