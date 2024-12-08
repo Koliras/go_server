@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/Koliras/go_server/api"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
