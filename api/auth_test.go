@@ -11,7 +11,7 @@ func TestPassValidation(t *testing.T) {
 	}
 	tests := []struct {
 		name  string
-		input Pass
+		input string
 		want  wanted
 	}{
 		{"Pass shorter than 8 letters should be invalid", "pass", wanted{false, "Password is too short"}},
@@ -24,7 +24,7 @@ func TestPassValidation(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			validity, message := test.input.IsValid()
+			validity, message := IsValid(&test.input)
 			if validity != test.want.valid || message != test.want.message {
 				t.Errorf("Got %+v, want %+v", wanted{validity, message}, test.want)
 			}

@@ -3,11 +3,17 @@ package api
 import (
 	"database/sql"
 	"net/http"
+
+	"github.com/Koliras/go_server/db"
 )
+
+type App struct {
+	DB db.DbInstance
+}
 
 func Routes(con *sql.DB) http.Handler {
 	app := App{
-		DbInstance{con},
+		db.DbInstance{con},
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", app.Healthcheck)

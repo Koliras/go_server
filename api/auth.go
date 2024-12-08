@@ -7,10 +7,8 @@ import (
 	"unicode"
 )
 
-type Pass string
-
-func (p Pass) IsValid() (bool, string) {
-	if len(p) < 8 {
+func IsValid(p *string) (bool, string) {
+	if len(*p) < 8 {
 		return false, "Password is too short"
 	}
 	type condition struct {
@@ -23,7 +21,7 @@ func (p Pass) IsValid() (bool, string) {
 		hasLowerChar = condition{false, "Password has to contain at least 1 lowercase letter"}
 		hasSymbol    = condition{false, "Password has to contain at least 1 symbol"}
 	)
-	for _, char := range p {
+	for _, char := range *p {
 		switch {
 		case unicode.IsDigit(char):
 			hasNum.valid = true
@@ -51,7 +49,7 @@ func (p Pass) IsValid() (bool, string) {
 
 type registerBody struct {
 	Nickname string `json:"nickname"`
-	Password Pass   `json:"password"`
+	Password string `json:"password"`
 	Email    string `json:"email"`
 }
 
@@ -68,7 +66,7 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	valid, message := data.Password.IsValid()
+	valid, message := IsValid(&data.Password)
 	if !valid {
 		w.Write([]byte(message))
 		return

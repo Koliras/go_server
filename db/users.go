@@ -1,12 +1,10 @@
-package api
+package db
 
-import "database/sql"
-
-type DbInstance struct {
-	*sql.DB
-}
-type App struct {
-	DB DbInstance
+type User struct {
+	Id       int    `json:"id"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (db DbInstance) CreateUser(nickname, email, password string) error {
