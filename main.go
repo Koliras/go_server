@@ -12,5 +12,6 @@ func main() {
 		Addr: ":8080",
 	}
 	http.HandleFunc("GET /", api.Healthcheck)
+	http.HandleFunc("POST /auth/register", api.Register)
 	log.Fatal(s.ListenAndServe())
 }
