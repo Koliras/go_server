@@ -7,10 +7,20 @@ type User struct {
 	Password string `json:"password"`
 }
 
-func (db DbInstance) CreateUser(nickname, email, password string) error {
+func (db DbInstance) CreateUser(nickname, email, password *string) error {
 	stmnt := "INSERT INTO users (nickname, email, password) VALUES(?, ?, ?)"
 	_, err := db.Exec(stmnt, nickname, email, password)
 	return err
+}
+
+func (db DbInstance) GetUserByEmail(email *string) (User, error) {
+	stmt := "SELECT id, nickname, email, password FROM users WHERE email=? LIMIT 1"
+	row := db.QueryRow(stmt, email)
+	u := User{}
+	if err := row.Scan(&u.Id, &u.Nickname, &u.Email, &u.Password); err != nil {
+		return u, err
+	}
+	return u, nil
 }
 
 func (db DbInstance) AllUsers() ([]User, error) {

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -82,12 +83,60 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.DB.CreateUser(data.Nickname, data.Email, hashedPassword)
+	err = app.DB.CreateUser(&data.Nickname, &data.Email, &hashedPassword)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 	w.Write([]byte("Created user"))
+}
+
+type loginBody struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (app App) Login(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.Write([]byte("Error when reading the body of the request"))
+		return
+	}
+
+	data := loginBody{}
+	if err := json.Unmarshal(body, &data); err != nil {
+		res, error := jsonError(err.Error(), 500)
+		if error != nil {
+			http.Error(w, error.Error(), 500)
+		}
+		w.Write(res)
+		return
+	}
+
+	user, err := app.DB.GetUserByEmail(&data.Email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "User with such email not found", 404)
+			return
+		}
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	isSamePass := verifyPassword(&data.Password, &user.Password)
+	if !isSamePass {
+		http.Error(w, "Incorrect email or password", http.StatusNotFound)
+		return
+	}
+
+	strUser, err := json.Marshal(user)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(strUser)
 }
 
 func (app App) GetAllUsers(w http.ResponseWriter, r *http.Request) {
@@ -104,4 +153,3 @@ func (app App) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(strUsers)
 }
-

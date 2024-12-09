@@ -17,8 +17,10 @@ func Routes(con *sql.DB) http.Handler {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", app.Healthcheck)
+	mux.HandleFunc("POST /auth/login", app.Login)
 	mux.HandleFunc("POST /auth/register", app.Register)
 	mux.HandleFunc("GET /users", app.GetAllUsers)
 
 	return mux
 }
+
