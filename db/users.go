@@ -15,12 +15,9 @@ func (db DbInstance) CreateUser(nickname, email, password *string) error {
 
 func (db DbInstance) GetUserByEmail(email *string) (User, error) {
 	stmt := "SELECT id, nickname, email, password FROM users WHERE email=? LIMIT 1"
-	row := db.QueryRow(stmt, email)
 	u := User{}
-	if err := row.Scan(&u.Id, &u.Nickname, &u.Email, &u.Password); err != nil {
-		return u, err
-	}
-	return u, nil
+	err := db.QueryRow(stmt, email).Scan(&u.Id, &u.Nickname, &u.Email, &u.Password)
+	return u, err
 }
 
 func (db DbInstance) AllUsers() ([]User, error) {

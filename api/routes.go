@@ -23,4 +23,3 @@ func Routes(con *sql.DB) http.Handler {
 
 	return mux
 }
-
