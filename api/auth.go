@@ -77,7 +77,7 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hashedPassword, err := hashPassword(&data.Password)
+	hashedPassword, err := hashString(&data.Password)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -123,7 +123,7 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isSamePass := verifyPassword(&data.Password, &user.Password)
+	isSamePass := compareStrWithHash(&data.Password, &user.Password)
 	if !isSamePass {
 		http.Error(w, "Incorrect email or password", http.StatusNotFound)
 		return
