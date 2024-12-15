@@ -5,8 +5,23 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 	"unicode"
+
+	"github.com/Koliras/go_server/utils"
+	"github.com/golang-jwt/jwt/v5"
 )
+
+const JwtTokenCookieName = "Go-Server"
+
+// WARN: change later to real secret
+var JwtKey = []byte("some_secret_key")
+
+type LoginClaims struct {
+	Email    string `json:"email"`
+	Nickname string `json:"nickcname"`
+	jwt.RegisteredClaims
+}
 
 func IsValidPassword(p *string) (bool, string) {
 	if len(*p) < 8 {
@@ -77,7 +92,7 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hashedPassword, err := hashString(&data.Password)
+	hashedPassword, err := utils.HashString(&data.Password)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -105,11 +120,7 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 
 	data := loginBody{}
 	if err := json.Unmarshal(body, &data); err != nil {
-		res, error := jsonError(err.Error(), 500)
-		if error != nil {
-			http.Error(w, error.Error(), 500)
-		}
-		w.Write(res)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
@@ -123,20 +134,33 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isSamePass := compareStrWithHash(&data.Password, &user.Password)
+	isSamePass := utils.CompareStrWithHash(&data.Password, &user.Password)
 	if !isSamePass {
 		http.Error(w, "Incorrect email or password", http.StatusNotFound)
 		return
 	}
 
-	strUser, err := json.Marshal(user)
+	claims := LoginClaims{
+		user.Email,
+		user.Nickname,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+		},
+	}
+
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(JwtKey)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+	cookie := &http.Cookie{
+		Name:     JwtTokenCookieName,
+		Value:    token,
+		HttpOnly: true,
+	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write(strUser)
+	http.SetCookie(w, cookie)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (app App) GetAllUsers(w http.ResponseWriter, r *http.Request) {
