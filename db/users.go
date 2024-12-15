@@ -1,5 +1,7 @@
 package db
 
+import "database/sql"
+
 type User struct {
 	Id       int    `json:"id"`
 	Nickname string `json:"nickname"`
@@ -18,6 +20,17 @@ func (db DbInstance) GetUserByEmail(email *string) (User, error) {
 	u := User{}
 	err := db.QueryRow(stmt, email).Scan(&u.Id, &u.Nickname, &u.Email, &u.Password)
 	return u, err
+}
+
+func (db DbInstance) UserExists(email *string) (bool, error) {
+	stmt := "SELECT 1 FROM users WHERE email=? LIMIT 1"
+	u := 0
+	err := db.QueryRow(stmt, email).Scan(&u)
+
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+	return u == 1, err
 }
 
 func (db DbInstance) AllUsers() ([]User, error) {

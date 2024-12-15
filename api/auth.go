@@ -8,20 +8,10 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/Koliras/go_server/middleware"
 	"github.com/Koliras/go_server/utils"
 	"github.com/golang-jwt/jwt/v5"
 )
-
-const JwtTokenCookieName = "Go-Server"
-
-// WARN: change later to real secret
-var JwtKey = []byte("some_secret_key")
-
-type LoginClaims struct {
-	Email    string `json:"email"`
-	Nickname string `json:"nickcname"`
-	jwt.RegisteredClaims
-}
 
 func IsValidPassword(p *string) (bool, string) {
 	if len(*p) < 8 {
@@ -140,7 +130,7 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims := LoginClaims{
+	claims := middleware.JwtClaims{
 		user.Email,
 		user.Nickname,
 		jwt.RegisteredClaims{
@@ -148,13 +138,13 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(JwtKey)
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(middleware.JwtKey)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 	cookie := &http.Cookie{
-		Name:     JwtTokenCookieName,
+		Name:     middleware.JwtTokenCookieName,
 		Value:    token,
 		HttpOnly: true,
 	}
