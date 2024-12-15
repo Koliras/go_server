@@ -16,10 +16,10 @@ func Routes(con *sql.DB) http.Handler {
 		db.DbInstance{con},
 	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /healthcheck", app.Healthcheck)
-	mux.HandleFunc("POST /auth/login", app.Login)
-	mux.HandleFunc("POST /auth/register", app.Register)
-	mux.HandleFunc("GET /users", app.GetAllUsers)
+	mux.HandleFunc("GET /api/healthcheck", app.Healthcheck)
+	mux.HandleFunc("POST /api/auth/login", app.Login)
+	mux.HandleFunc("POST /api/auth/register", app.Register)
+	mux.HandleFunc("GET /api/users", app.GetAllUsers)
 
 	return mux
 }
