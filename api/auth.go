@@ -62,23 +62,23 @@ type registerBody struct {
 func (app App) Register(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		w.Write([]byte("Error when reading the body of the request"))
+		http.Error(w, "Error when reading the body of the request", http.StatusUnprocessableEntity)
 		return
 	}
 
 	data := registerBody{}
 	if err := json.Unmarshal(body, &data); err != nil {
-		w.Write([]byte("Invalid json"))
+		http.Error(w, "Invalid json", http.StatusUnprocessableEntity)
 		return
 	}
 
 	valid, message := IsValidPassword(&data.Password)
 	if !valid {
-		w.Write([]byte(message))
+		http.Error(w, message, http.StatusUnprocessableEntity)
 		return
 	}
 	if data.Nickname == "" || data.Email == "" {
-		w.Write([]byte("Nickname and email are required"))
+		http.Error(w, "Nickname and email are required", http.StatusUnprocessableEntity)
 		return
 	}
 
