@@ -11,6 +11,7 @@ import (
 
 func main() {
 	db, err := sql.Open("sqlite3", "./app.db")
+	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
