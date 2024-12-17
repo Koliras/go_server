@@ -93,7 +93,7 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	w.Write([]byte("Created user"))
+	w.WriteHeader(http.StatusCreated)
 }
 
 type loginBody struct {
