@@ -54,9 +54,10 @@ func IsValidPassword(p *string) (bool, string) {
 }
 
 type registerBody struct {
-	Nickname string `json:"nickname"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
+	Nickname       string `json:"nickname"`
+	Password       string `json:"password"`
+	RepeatPassword string `json:"repeat_password"`
+	Email          string `json:"email"`
 }
 
 func (app App) Register(w http.ResponseWriter, r *http.Request) {
@@ -69,6 +70,11 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 	data := registerBody{}
 	if err := json.Unmarshal(body, &data); err != nil {
 		http.Error(w, "Invalid json", http.StatusUnprocessableEntity)
+		return
+	}
+
+	if data.Password != data.RepeatPassword {
+		http.Error(w, "Password is not equal to repeated password", http.StatusUnprocessableEntity)
 		return
 	}
 
