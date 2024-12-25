@@ -19,5 +19,6 @@ func main() {
 		Addr:    ":8080",
 		Handler: api.Routes(db),
 	}
+	print("Working at http://localhost:8080/\n")
 	log.Fatal(s.ListenAndServe())
 }

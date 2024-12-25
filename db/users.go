@@ -23,9 +23,26 @@ func (db DbInstance) GetUserByEmail(email *string) (User, error) {
 }
 
 func (db DbInstance) UserExists(email *string) (bool, error) {
+	if len(*email) == 0 {
+		return false, nil
+	}
 	stmt := "SELECT 1 FROM users WHERE email=? LIMIT 1"
 	u := 0
 	err := db.QueryRow(stmt, email).Scan(&u)
+
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+	return u == 1, err
+}
+
+func (db DbInstance) NicknameUsed(nickname *string) (bool, error) {
+	if len(*nickname) == 0 {
+		return false, nil
+	}
+	stmt := "SELECT 1 FROM users WHERE nickname=? LIMIT 1"
+	u := 0
+	err := db.QueryRow(stmt, nickname).Scan(&u)
 
 	if err == sql.ErrNoRows {
 		return false, nil
