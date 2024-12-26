@@ -14,8 +14,8 @@ type RegisterInput struct {
 	Email          string `json:"email"`
 }
 
-func ValidateRegisterData(d RegisterInput) templ.RegisterFormData {
-	r := templ.RegisterFormData{}
+func ValidateRegisterData(d RegisterInput) templ.DataRegisterForm {
+	r := templ.DataRegisterForm{}
 
 	r.PasswordErrors = passErrors(&d.Password)
 	if d.Password != d.RepeatPassword {

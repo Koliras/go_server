@@ -15,12 +15,12 @@ import (
 
 func (app App) Register(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
-	registerFormData := templ.RegisterFormData{}
+	registerFormData := templ.DataRegisterForm{}
 
 	err := r.ParseForm()
 	if err != nil {
 		registerFormData.GeneralError = "Failed to parse body of request"
-		templ.FormRegisterErrors(w, registerFormData)
+		templ.HtmlFormRegisterErrors(w, registerFormData)
 		return
 	}
 
@@ -65,14 +65,14 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 
 	if checkError != nil {
 		registerFormData.GeneralError = "Internal server error"
-		templ.FormRegisterErrors(w, registerFormData)
+		templ.HtmlFormRegisterErrors(w, registerFormData)
 		return
 	}
 
 	hashedPassword, err := utils.HashString(&data.Password)
 	if err != nil {
 		registerFormData.GeneralError = "Internal server error"
-		templ.FormRegisterErrors(w, registerFormData)
+		templ.HtmlFormRegisterErrors(w, registerFormData)
 		return
 	}
 
@@ -82,14 +82,14 @@ func (app App) Register(w http.ResponseWriter, r *http.Request) {
 		len(registerFormData.EmailErrors) != 0 ||
 		len(registerFormData.NicknameErrors) != 0 {
 
-		templ.FormRegisterErrors(w, registerFormData)
+		templ.HtmlFormRegisterErrors(w, registerFormData)
 		return
 	}
 
 	err = app.DB.CreateUser(&data.Nickname, &data.Email, &hashedPassword)
 	if err != nil {
 		registerFormData.GeneralError = "Error when creating user"
-		templ.FormRegisterErrors(w, registerFormData)
+		templ.HtmlFormRegisterErrors(w, registerFormData)
 		return
 	}
 	w.Header().Add("HX-Push-Url", "/profile")
@@ -102,12 +102,12 @@ type loginBody struct {
 
 func (app App) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
-	loginFormData := templ.LoginFormData{}
+	loginFormData := templ.DataLoginForm{}
 
 	err := r.ParseForm()
 	if err != nil {
 		loginFormData.Error = "Failed to parse the body of request"
-		templ.FormLoginErrors(w, loginFormData)
+		templ.HtmlFormLoginErrors(w, loginFormData)
 		return
 	}
 
@@ -122,18 +122,18 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			loginFormData.Error = "User with such email not found"
-			templ.FormLoginErrors(w, loginFormData)
+			templ.HtmlFormLoginErrors(w, loginFormData)
 			return
 		}
 		loginFormData.Error = "Internal server error"
-		templ.FormLoginErrors(w, loginFormData)
+		templ.HtmlFormLoginErrors(w, loginFormData)
 		return
 	}
 
 	isSamePass := utils.CompareStrWithHash(&data.Password, &user.Password)
 	if !isSamePass {
 		loginFormData.Error = "Incorrect email or password"
-		templ.FormLoginErrors(w, loginFormData)
+		templ.HtmlFormLoginErrors(w, loginFormData)
 		return
 	}
 
@@ -148,11 +148,11 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(middleware.JwtKey)
 	if err != nil {
 		loginFormData.Error = "Incorrect email or password"
-		templ.FormLoginErrors(w, loginFormData)
+		templ.HtmlFormLoginErrors(w, loginFormData)
 		return
 	}
 	if len(loginFormData.Error) == 0 {
-		templ.FormLoginErrors(w, loginFormData)
+		templ.HtmlFormLoginErrors(w, loginFormData)
 		return
 	}
 	cookie := &http.Cookie{
