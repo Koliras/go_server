@@ -6,13 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Register</title>
     <link href="static/style.css" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@2.0.4"
-        integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
-        crossorigin="anonymous"></script>
+    <script src="static/third_party/htmx.min.js"></script>
 </head>
 
 <body class="form_page">
-    <form class="form" id="form" hx-post="/api/auth/register" hx-swap="outerHTML" method="POST">
+    <form class="form" id="form" hx-post="/api/auth/login" hx-swap="outerHTML" method="POST">
         <label for="email" class="form_label">Email:</label>
         <input type="email" name="email" value="" class="form_text_input">
 
