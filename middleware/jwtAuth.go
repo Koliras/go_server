@@ -13,8 +13,8 @@ const JwtTokenCookieName = "Go-Server"
 var JwtKey = []byte("some_secret_key")
 
 type JwtClaims struct {
-	Email    string `json:"email"`
-	Nickname string `json:"nickcname"`
+	Email    string
+	Nickname string
 	jwt.RegisteredClaims
 }
 
