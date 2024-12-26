@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"io"
 	"net/http"
 	"sync"
 	"time"
@@ -102,31 +101,39 @@ type loginBody struct {
 }
 
 func (app App) Login(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
+	w.Header().Add("Content-Type", "text/html; charset=utf-8")
+	loginFormData := templ.LoginFormData{}
+
+	err := r.ParseForm()
 	if err != nil {
-		w.Write([]byte("Error when reading the body of the request"))
+		loginFormData.Error = "Failed to parse the body of request"
+		templ.FormLoginErrors(w, loginFormData)
 		return
 	}
 
-	data := loginBody{}
-	if err := json.Unmarshal(body, &data); err != nil {
-		http.Error(w, err.Error(), 500)
-		return
+	data := loginBody{
+		Email:    r.PostFormValue("email"),
+		Password: r.PostFormValue("password"),
 	}
+	loginFormData.Email = data.Email
+	loginFormData.Password = data.Password
 
 	user, err := app.DB.GetUserByEmail(&data.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			http.Error(w, "User with such email not found", 404)
+			loginFormData.Error = "User with such email not found"
+			templ.FormLoginErrors(w, loginFormData)
 			return
 		}
-		http.Error(w, err.Error(), 500)
+		loginFormData.Error = "Internal server error"
+		templ.FormLoginErrors(w, loginFormData)
 		return
 	}
 
 	isSamePass := utils.CompareStrWithHash(&data.Password, &user.Password)
 	if !isSamePass {
-		http.Error(w, "Incorrect email or password", http.StatusNotFound)
+		loginFormData.Error = "Incorrect email or password"
+		templ.FormLoginErrors(w, loginFormData)
 		return
 	}
 
@@ -140,7 +147,12 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(middleware.JwtKey)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		loginFormData.Error = "Incorrect email or password"
+		templ.FormLoginErrors(w, loginFormData)
+		return
+	}
+	if len(loginFormData.Error) == 0 {
+		templ.FormLoginErrors(w, loginFormData)
 		return
 	}
 	cookie := &http.Cookie{
@@ -151,6 +163,7 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, cookie)
 	w.WriteHeader(http.StatusNoContent)
+	w.Header().Add("HX-Push-Url", "/profile")
 }
 
 func (app App) GetAllUsers(w http.ResponseWriter, r *http.Request) {

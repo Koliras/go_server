@@ -11,13 +11,24 @@ type RegisterFormData struct {
 	NicknameErrors       []string
 	Email                string
 	EmailErrors          []string
-	PasswordErrors       []string
 	Password             string
-	RepeatPasswordErrors []string
+	PasswordErrors       []string
 	RepeatPassword       string
+	RepeatPasswordErrors []string
 }
 
 func FormRegisterErrors(w http.ResponseWriter, data RegisterFormData) {
 	w.WriteHeader(http.StatusUnprocessableEntity)
 	template.Must(template.ParseFiles("./templ/form.html")).ExecuteTemplate(w, "register_errors", data)
+}
+
+type LoginFormData struct {
+	Error    string
+	Email    string
+	Password string
+}
+
+func FormLoginErrors(w http.ResponseWriter, data LoginFormData) {
+	w.WriteHeader(http.StatusUnprocessableEntity)
+	template.Must(template.ParseFiles("./templ/form.html")).ExecuteTemplate(w, "login_errors", data)
 }

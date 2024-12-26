@@ -34,3 +34,19 @@
     <input type="submit" name="submit" value="Submit">
 </form>
 {{ end }}
+
+{{ block "login_errors" . }}
+<form class="form" id="form" hx-post="/api/auth/login" hx-swap="outerHTML" method="POST">
+    {{ if .Error }}
+    <h3 class="error">{{ .Error }}</h3>
+    {{ end }}
+    <label for="email" class="form_label">Email:</label>
+    <input type="email" name="email" value="{{ .Email }}" class="form_text_input {{ if .Error }}error_input{{ end }}">
+
+    <label for="password" class="form_label">Password:</label>
+    <input type="password" name="password" value="{{ .Password }}"
+        class="form_text_input {{ if .Error }}error_input{{ end }}">
+
+    <input type="submit" name="submit" value="Submit">
+</form>
+{{ end }}
