@@ -147,7 +147,7 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(middleware.JwtKey)
 	if err != nil {
-		loginFormData.Error = "Incorrect email or password"
+		loginFormData.Error = "Internal server error"
 		templ.HtmlFormLoginErrors(w, loginFormData)
 		return
 	}
