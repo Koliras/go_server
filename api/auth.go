@@ -151,7 +151,7 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 		templ.HtmlFormLoginErrors(w, loginFormData)
 		return
 	}
-	if len(loginFormData.Error) == 0 {
+	if len(loginFormData.Error) != 0 {
 		templ.HtmlFormLoginErrors(w, loginFormData)
 		return
 	}
@@ -162,8 +162,8 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, cookie)
-	w.WriteHeader(http.StatusNoContent)
 	w.Header().Add("HX-Push-Url", "/profile")
+	templ.HtmlProfile(w, templ.DataProfile{Nickname: user.Nickname, ContentType: "posts"})
 }
 
 func (app App) GetAllUsers(w http.ResponseWriter, r *http.Request) {

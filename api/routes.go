@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Koliras/go_server/db"
+	"github.com/Koliras/go_server/middleware"
 )
 
 type App struct {
@@ -22,6 +23,7 @@ func Routes(con *sql.DB) http.Handler {
 
 	mux.HandleFunc("GET /register", app.StaticRegisterForm)
 	mux.HandleFunc("GET /login", app.StaticLoginForm)
+	mux.HandleFunc("GET /profile", middleware.JwtAuth(app.StaticProfile, app.DB))
 
 	mux.HandleFunc("GET /api/healthcheck", app.Healthcheck)
 	mux.HandleFunc("POST /api/auth/login", app.Login)
