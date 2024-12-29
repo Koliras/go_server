@@ -159,11 +159,12 @@ func (app App) Login(w http.ResponseWriter, r *http.Request) {
 		Name:     middleware.JwtTokenCookieName,
 		Value:    token,
 		HttpOnly: true,
+		Expires:  time.Now().Add(1 * time.Hour),
+		Path:     "/",
 	}
 
 	http.SetCookie(w, cookie)
-	w.Header().Add("HX-Push-Url", "/profile")
-	templ.HtmlProfile(w, templ.DataProfile{Nickname: user.Nickname, ContentType: "posts"})
+	w.Header().Add("HX-Redirect", "/profile")
 }
 
 func (app App) GetAllUsers(w http.ResponseWriter, r *http.Request) {
