@@ -1,24 +1,7 @@
 package main
 
-import (
-	"database/sql"
-	"log"
-	"net/http"
-
-	"github.com/Koliras/go_server/api"
-	_ "github.com/mattn/go-sqlite3"
-)
+import "fmt"
 
 func main() {
-	db, err := sql.Open("sqlite3", "./app.db")
-	defer db.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	s := &http.Server{
-		Addr:    ":8080",
-		Handler: api.Routes(db),
-	}
-	print("Working at http://localhost:8080/\n")
-	log.Fatal(s.ListenAndServe())
+	fmt.Println("Anihilated the old code")
 }
