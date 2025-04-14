@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
+	fs := http.FileServer(http.Dir("assets/"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", RequestHandler)
 	err := http.ListenAndServe(":8888", nil)
 	if err != nil {
